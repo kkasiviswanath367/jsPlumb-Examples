@@ -89,7 +89,8 @@ export default class ExJsplumb5 extends Component {
 	  });  
 	  
       jsplumb.jsPlumb.bind('connection', function(info) {
-	    $.post('http://www.example.com/saveConnection', { from: info.sourceId, to: info.targetId});
+       // $.post('http://www.example.com/saveConnection', { from: info.sourceId, to: info.targetId});
+       alert('New connection!\nFrom: ' + info.sourceId + '\nTo: ' + info.targetId);
       });	  
 	  
 	});  
