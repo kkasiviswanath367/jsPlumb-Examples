@@ -3,7 +3,7 @@ import './style.css';
 import jsplumb from 'jsplumb';
 import $ from 'jquery';
 
-export default class ExJsplumb6 extends Component {
+export default class ExJsplumb15 extends Component {
   constructor() {
     super();
     this.state = {
