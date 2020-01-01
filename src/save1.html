@@ -170,6 +170,11 @@
     ._jsPlumb_startpoint {
       cursor: pointer;
     }
+	
+	.aLabel1 {
+        border: 2px solid red;
+        cursor: pointer;
+    }  
   </style>
 </head>
 
@@ -198,8 +203,11 @@
 
   <div id="drawingArea" style="width:100%; min-height:700px; background: #d6d6d6; margin-bottom: 6px;"></div>
  <textarea id="jsonOutput" style="width:100%; height:140px;" >
-    {"nodes":[{"blockId":"decisioncontainer7","nodetype":"decision","positionX":339,"positionY":158},{"blockId":"taskcontainer8","nodetype":"task","positionX":436,"positionY":313},{"blockId":"decisioncontainer9","nodetype":"decision","positionX":679,"positionY":369},{"blockId":"taskcontainer10","nodetype":"task","positionX":926,"positionY":374},{"blockId":"decisioncontainer7","nodetype":"decision","positionX":339,"positionY":158},{"blockId":"decisioncontainer7","nodetype":"decision","positionX":339,"positionY":158},{"blockId":"taskcontainer11","nodetype":"task","positionX":621,"positionY":132},{"blockId":"decisioncontainer12","nodetype":"decision","positionX":1280,"positionY":376}],"connections":[{"sourceId":"decisioncontainer7","targetId":"taskcontainer8","uuids":["decisioncontainer7rm-out","taskcontainer8tm-in"],"anchors":[[1,0.5],[0.5,0]]},{"sourceId":"taskcontainer8","targetId":"decisioncontainer9","uuids":["taskcontainer8rm-out","decisioncontainer9lm-in"],"anchors":[[1,0.5],[0,0.5]]},{"sourceId":"decisioncontainer9","targetId":"taskcontainer10","uuids":["decisioncontainer9rm-out","taskcontainer10lb-in"],"anchors":[[1,0.5],[0,0.8]]},{"sourceId":"taskcontainer11","targetId":"taskcontainer10","uuids":["taskcontainer11rm-out","taskcontainer10lt-in"],"anchors":[[1,0.5],[0,0.2]]},{"sourceId":"taskcontainer10","targetId":"decisioncontainer12","uuids":["taskcontainer10rm-out","decisioncontainer12lm-in"],"anchors":[[1,0.5],[0,0.5]]}],"numberOfElements":12}
-  </textarea>
+ 
+{"nodes":[{"blockId":"taskcontainer1","nodetype":"task","positionX":351,"positionY":100},{"blockId":"taskcontainer2","nodetype":"task","positionX":661,"positionY":94},{"blockId":"taskcontainer3","nodetype":"task","positionX":939,"positionY":117}],"connections":[{"sourceId":"taskcontainer1","targetId":"taskcontainer2","uuids":["taskcontainer1rm-out","taskcontainer2lm-in"],"overlays":[["Arrow",{"width":24,"length":24,"location":0.8}],["Label",{"label":"Process","id":"label","cssClass":"aLabel"}]],"anchors":[[1,0.5],[0,0.5]]},{"sourceId":"taskcontainer2","targetId":"taskcontainer3","uuids":["taskcontainer2rm-out","taskcontainer3lm-in"],"overlays":[["Arrow",{"width":24,"length":24,"location":0.8}],["Label",{"label":"Process","id":"label","cssClass":"aLabel"}]],"anchors":[[1,0.5],[0,0.5]]}],"numberOfElements":3}
+ 
+ 
+ </textarea>
 
   <script src="https://cdn.bootcss.com/jquery/2.2.1/jquery.js"></script>
   <script src="https://cdn.bootcss.com/jsPlumb/2.9.0/js/jsplumb.js"></script>
@@ -239,8 +247,31 @@
             id: "arrow",
             length: 10,
             width: 14,
-            foldback: 0.6
-          }]
+            foldback: 0.6,
+			events: {
+                click: function() {
+                  alert("you clicked on the arrow overlay");
+                }
+              }
+          }],
+		   [
+            "Label",
+            {
+              location: 0.3,
+              label:"x",
+              id: "label2",
+              cssClass: "aLabel1",
+              events: {
+                click:function (label) {
+                   // self.lableDelete(instance)
+				   alert("label Clicked")
+				   
+				   jsPlumb.bind("click", function(c) {
+        jsPlumb.deleteConnection(c);
+      });
+              }
+              }
+            }]
         ]
       });
 
@@ -457,6 +488,8 @@
       var connections = [];
 
       $.each(jsPlumb.getConnections(), function (idx, connection) {
+	  
+	  console.log("jsPlumb.getConnections()",connection.getOverlay("label2").label)
         // console.log(connection.getUuids()); // ["decisioncontainer1rm-out", "decisioncontainer2lm-in"]
 
         connections.push({
@@ -464,6 +497,12 @@
           sourceId: connection.sourceId,
           targetId: connection.targetId,
           uuids: connection.getUuids(),
+		 overlays:[
+           ["Arrow",{width:24,length:24,location:0.80}],
+           ["Label",{
+               label:"Process",id:"label",cssClass:"aLabel",
+           }]
+       ],
           anchors: $.map(connection.endpoints, function(endpoint) {
             console.error(endpoint.getUuid());
             // console.log(endpoint)
@@ -495,8 +534,9 @@
 
       $("#jsonOutput").val(flowChartJson);
     }
-
+   
     function loadFlowchart() {
+	  jsPlumb.empty("drawingArea");
       var flowChartJson = $("#jsonOutput").val();
       var flowChart = JSON.parse(flowChartJson);
       var nodes = flowChart.nodes;
@@ -521,6 +561,7 @@
       var connections = flowChart.connections;
 
       $.each(connections, function (index, elem) {
+	  alert("yes here")
         console.log(elem)
         // jsPlumb.connect({
         //   source: elem.sourceId,
@@ -529,14 +570,20 @@
         // });
 
         jsPlumb.connect({
-          uuids: elem.uuids
+          uuids: elem.uuids,
+		   source: elem.sourceId,
+		   target: elem.targetId,
+		   anchors: elem.anchors,
+		   overlays: elem.overlays
         })
       });
+	  
+	  
 
       numberOfElements = flowChart.numberOfElements;
     }
 
-    function repositionElement({ id, posX, posY }) {
+    function repositionElement( id, posX, posY ) {
       console.log(id);
       $("#" + id).css("left", posX);
       $("#" + id).css("top", posY);
