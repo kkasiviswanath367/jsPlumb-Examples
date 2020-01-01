@@ -77,6 +77,20 @@
     opacity: 0.8;
     cursor: pointer;
   }
+
+  .flowchart-demo .aLabel1 {
+    background-color: white;
+    padding: 0.4em;
+    font: 12px sans-serif;
+    color: #444;
+    z-index: 21;
+    border: 1px dotted gray;
+    opacity: 0.8;
+    cursor: pointer;
+  }
+
+
+
   .flowchart-demo .aLabel.jtk-hover {
     background-color: #5c96bc;
     color: white;
